@@ -28,7 +28,7 @@ def run_experiment(exp):
 
     pruning.tools.globally_enable_pruning()
     loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-    dataset = datasets.cifar(version=exp["cifar_version"])
+    dataset = datasets.cifar(version=exp["cifar_version"], data_dir=exp["data_dir"])
 
     if exp["model"] == "resnet":
         model = models.ResNetStiff(**exp["model_args"])

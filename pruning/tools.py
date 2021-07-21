@@ -1,13 +1,8 @@
 import numpy as np
 import tensorflow as tf
 
-from modules.pruning import sparse_layers
-from modules.tf_helper import tf_utils
-
-try:
-    from ._initialize import *
-except ImportError:
-    pass
+from pruning import sparse_layers
+from training import tools
 
 
 def globally_enable_pruning():
@@ -33,14 +28,6 @@ def structurize_salience(saliences):
 def structurize_salience_dense(saliences):
     means = np.mean(saliences, axis=1, keepdims=True)
     return np.ones_like(saliences) * means
-
-
-# def structurize_salience_conv(saliences):
-#     shape = saliences.shape
-#     saliences = np.reshape(saliences, (shape[0], shape[1], -1))
-#     means = np.mean(saliences, axis=(0, 1), keepdims=True)
-#     saliences = np.ones_like(saliences) * means
-#     return np.reshape(saliences, shape)
 
 
 def structurize_salience_conv(saliences):
@@ -73,72 +60,6 @@ def snip_saliences(model, loader, batches=1):
     return saliences
 
 
-def psuedo_snip_saliences(model, *args, **kwds):
-    """
-    :param model: callable model with trainable_weights
-    :return: dict, keys are Variable name, values are saliences from SNIP
-    """
-    cumulative_grads = [tf.random.uniform(shape=w.shape, minval=-1, maxval=1) for w in
-                        model.trainable_weights]
-    saliences = {w.name: tf.abs(w * g).numpy() for w, g in
-                 zip(model.trainable_weights, cumulative_grads)}
-    return saliences
-
-
-def grasp_saliences(model, loader, batches=1):
-    """
-    :param model: callable model with trainable_weights
-    :param loader: `tf.data.Dataset` with `.take` method
-    :param batches: int, number of batches to take with `.take` method
-    :return: dict, keys are Variable name, values are saliences from GraSP
-    """
-    loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-    cumulative_grads = [tf.zeros_like(w) for w in model.trainable_weights]
-
-    for x, y in loader.take(batches):
-        with tf.GradientTape() as tape:
-            with tf.GradientTape() as tape2:
-                outs = model(x)
-                outs = tf.cast(outs, tf.float32)
-                loss = loss_fn(y, outs)
-            g1 = tape2.gradient(loss, model.trainable_weights)
-            g1 = tf.concat([tf.reshape(g, -1) for g in g1], 0)
-            g1 = tf.reduce_sum(g1 * tf.stop_gradient(g1))
-        g2 = tape.gradient(g1, model.trainable_weights)
-        cumulative_grads = [c + g for c, g in zip(cumulative_grads, g2)]
-
-    saliences = {w.name: -(w * g).numpy() for w, g in
-                 zip(model.trainable_weights, cumulative_grads)}
-    return saliences
-
-
-def minus_grasp_saliences(model, loader, batches=1):
-    """
-    :param model: callable model with trainable_weights
-    :param loader: `tf.data.Dataset` with `.take` method
-    :param batches: int, number of batches to take with `.take` method
-    :return: dict, keys are Variable name, values are saliences from GraSP
-    """
-    loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
-    cumulative_grads = [tf.zeros_like(w) for w in model.trainable_weights]
-
-    for x, y in loader.take(batches):
-        with tf.GradientTape() as tape:
-            with tf.GradientTape() as tape2:
-                outs = model(x)
-                outs = tf.cast(outs, tf.float32)
-                loss = loss_fn(y, outs)
-            g1 = tape2.gradient(loss, model.trainable_weights)
-            g1 = tf.concat([tf.reshape(g, -1) for g in g1], 0)
-            g1 = tf.reduce_sum(g1 * tf.stop_gradient(g1))
-        g2 = tape.gradient(g1, model.trainable_weights)
-        cumulative_grads = [c + g for c, g in zip(cumulative_grads, g2)]
-
-    saliences = {w.name: (w * g).numpy() for w, g in
-                 zip(model.trainable_weights, cumulative_grads)}
-    return saliences
-
-
 def get_pruning_mask(saliences, percentage):
     """
     :param saliences: list of saliences arrays
@@ -148,7 +69,7 @@ def get_pruning_mask(saliences, percentage):
     sizes = [w.size for w in saliences]
     shapes = [w.shape for w in saliences]
 
-    flatten = tf_utils.concatenate_flattened(saliences)
+    flatten = tools.concatenate_flattened(saliences)
     flat_mask = np.ones_like(flatten)
 
     threshold = np.percentile(flatten, percentage * 100)
@@ -211,21 +132,6 @@ def prune_SNIP(model, dataset, config, silent=False):
     structure = config.get('structure')
 
     saliences = snip_saliences(model, dataset, batches=batches)
-    saliences = extract_kernels(saliences)
-    if structure:
-        saliences = structurize_saliences(saliences)
-    masks = saliences2masks(saliences, percentage=sparsity)
-    set_kernel_masks_for_model(model, masks, silent)
-    return model
-
-
-def prune_pseudo_SNIP(model, dataset, config, silent=False):
-    """In SNIP's `W*G` we replace gradients G with a random from [-1, 1]."""
-
-    sparsity = config.get('sparsity') or 0.0
-    structure = config.get('structure')
-
-    saliences = psuedo_snip_saliences(model)
     saliences = extract_kernels(saliences)
     if structure:
         saliences = structurize_saliences(saliences)
@@ -361,16 +267,10 @@ def set_pruning_masks(model, pruning_method, pruning_config, dataset):
         print('RANDOM PRUNING')
         model = prune_random(model=model, config=pruning_config)
     elif contains_any(pruning_method.lower(), 'snip'):
-        if contains_any(pruning_method.lower(), 'pseudo'):
-            print('PSUEDO SNIP PRUNING')
-            model = prune_pseudo_SNIP(model=model,
-                                      config=pruning_config,
-                                      dataset=dataset['train'])
-        else:
-            print('SNIP PRUNING')
-            model = prune_SNIP(model=model,
-                               config=pruning_config,
-                               dataset=dataset['train'])
+        print('SNIP PRUNING')
+        model = prune_SNIP(model=model,
+                           config=pruning_config,
+                           dataset=dataset['train'])
     elif contains_any(pruning_method.lower(), 'l1', 'magnitude'):
         print('WEIGHT MAGNITUDE PRUNING')
         model = prune_l1(model=model, config=pruning_config)

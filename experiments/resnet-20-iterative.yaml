@@ -1,0 +1,347 @@
+logs: data/resnet-20-iterative/info.yaml
+
+epochs: 36
+initial_epoch: 0
+steps_per_epoch: 2000
+
+lr_boundaries: [36000, 54000]
+lr_values: [0.1, 0.01, 0.001]
+
+model_args:
+    dataset: cifar10
+    l2_reg: 0.0001
+    features: [16, 32, 64]
+    resnet_version: 1
+    BLOCKS_IN_GROUP: 3
+    BATCH_NORM_DECAY: 0.997
+    BATCH_NORM_EPSILON: 0.001
+model: resnet
+
+cifar_version: 10
+data_dir: tensorflow_datasets
+---
+pruning: null
+Name: ResNet-20-baseline
+save_model:
+    4: data/resnet-20-iterative/baseline-ep4.h5
+    36: data/resnet-20-iterative/baseline-ep36.h5
+
+
+
+
+
+
+--- # LEARNING RATE REWINDING BLOCK
+load_model_before_pruning: data/resnet-20-iterative/baseline-ep36.h5
+pruning: magnitude
+pruning_config:
+    sparsity: 0.2
+Name: ResNet-20-iterative-0.2-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.2-ep36.h
+---
+load_model_before_pruning: data/resnet-20-iterative/LR-rewinding-sp-0.2-ep36.h
+pruning: magnitude
+pruning_config:
+    sparsity: 0.36
+Name: ResNet-20-iterative-0.36-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.36-ep36.h
+---
+load_model_before_pruning: data/resnet-20-iterative/LR-rewinding-sp-0.36-ep36.h
+pruning: magnitude
+pruning_config:
+    sparsity: 0.488
+Name: ResNet-20-iterative-0.488-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.488-ep36.h
+---
+load_model_before_pruning: data/resnet-20-iterative/LR-rewinding-sp-0.488-ep36.h
+pruning: magnitude
+pruning_config:
+    sparsity: 0.59
+Name: ResNet-20-iterative-0.59-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.59-ep36.h
+---
+load_model_before_pruning: data/resnet-20-iterative/LR-rewinding-sp-0.59-ep36.h
+pruning: magnitude
+pruning_config:
+    sparsity: 0.672
+Name: ResNet-20-iterative-0.672-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.672-ep36.h
+---
+load_model_before_pruning: data/resnet-20-iterative/LR-rewinding-sp-0.672-ep36.h
+pruning: magnitude
+pruning_config:
+    sparsity: 0.738
+Name: ResNet-20-iterative-0.672-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.738-ep36.h
+---
+load_model_before_pruning: data/resnet-20-iterative/LR-rewinding-sp-0.738-ep36.h
+pruning: magnitude
+pruning_config:
+    sparsity: 0.79
+Name: ResNet-20-iterative-0.79-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.79-ep36.h
+---
+load_model_before_pruning: data/resnet-20-iterative/LR-rewinding-sp-0.79-ep36.h
+pruning: magnitude
+pruning_config:
+    sparsity: 0.832
+Name: ResNet-20-iterative-0.832-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.832-ep36.h
+---
+load_model_before_pruning: data/resnet-20-iterative/LR-rewinding-sp-0.832-ep36.h
+pruning: magnitude
+pruning_config:
+    sparsity: 0.866
+Name: ResNet-20-iterative-0.866-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.866-ep36.h
+---
+load_model_before_pruning: data/resnet-20-iterative/LR-rewinding-sp-0.866-ep36.h
+pruning: magnitude
+pruning_config:
+    sparsity: 0.893
+Name: ResNet-20-iterative-0.893-LR-rewinding
+save_model:
+    36: data/resnet-20-iterative/LR-rewinding-sp-0.893-ep36.h
+
+
+
+
+
+
+--- # WEIGHT REWINDING BLOCK
+load_model_before_pruning: data/resnet-20-iterative/baseline-ep36.h5
+load_model_after_pruning: data/resnet-20-iterative/baseline-epp4h5
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.2
+Name: ResNet-20-iterative-0.2-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.2-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.2-ep4.h
+---
+load_model_before_pruning: data/resnet-20-iterative/W-rewinding-sp-0.2-ep36.h
+load_model_after_pruning: data/resnet-20-iterative/W-rewinding-sp-0.2-ep4.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.36
+Name: ResNet-20-iterative-0.36-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.36-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.36-ep4.h
+---
+load_model_before_pruning: data/resnet-20-iterative/W-rewinding-sp-0.36-ep36.h
+load_model_after_pruning: data/resnet-20-iterative/W-rewinding-sp-0.36-ep4.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.488
+Name: ResNet-20-iterative-0.488-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.488-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.488-ep4.h
+---
+load_model_before_pruning: data/resnet-20-iterative/W-rewinding-sp-0.488-ep36.h
+load_model_after_pruning: data/resnet-20-iterative/W-rewinding-sp-0.488-ep4.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.59
+Name: ResNet-20-iterative-0.59-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.59-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.59-ep4.h
+---
+load_model_before_pruning: data/resnet-20-iterative/W-rewinding-sp-0.59-ep36.h
+load_model_after_pruning: data/resnet-20-iterative/W-rewinding-sp-0.59-ep4.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.672
+Name: ResNet-20-iterative-0.672-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.672-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.672-ep4.h
+---
+load_model_before_pruning: data/resnet-20-iterative/W-rewinding-sp-0.672-ep36.h
+load_model_after_pruning: data/resnet-20-iterative/W-rewinding-sp-0.672-ep4.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.738
+Name: ResNet-20-iterative-0.672-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.738-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.738-ep4.h
+---
+load_model_before_pruning: data/resnet-20-iterative/W-rewinding-sp-0.738-ep36.h
+load_model_after_pruning: data/resnet-20-iterative/W-rewinding-sp-0.738-ep4.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.79
+Name: ResNet-20-iterative-0.79-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.79-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.79-ep4.h
+---
+load_model_before_pruning: data/resnet-20-iterative/W-rewinding-sp-0.79-ep36.h
+load_model_after_pruning: data/resnet-20-iterative/W-rewinding-sp-0.79-ep4.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.832
+Name: ResNet-20-iterative-0.832-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.832-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.832-ep4.h
+---
+load_model_before_pruning: data/resnet-20-iterative/W-rewinding-sp-0.832-ep36.h
+load_model_after_pruning: data/resnet-20-iterative/W-rewinding-sp-0.832-ep4.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.866
+Name: ResNet-20-iterative-0.866-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.866-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.866-ep4.h
+---
+load_model_before_pruning: data/resnet-20-iterative/W-rewinding-sp-0.866-ep36.h
+load_model_after_pruning: data/resnet-20-iterative/W-rewinding-sp-0.866-ep4.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.893
+Name: ResNet-20-iterative-0.893-W-rewinding
+save_model:
+    36: data/resnet-20-iterative/W-rewinding-sp-0.893-ep36.h
+    4: data/resnet-20-iterative/W-rewinding-sp-0.893-ep4.h
+
+
+
+
+
+
+--- # FINETUNING BLOCK
+load_model_before_pruning: data/resnet-20-iterative/baseline-ep36.h5
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.2
+Name: ResNet-20-iterative-0.2-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.2-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+---
+load_model_before_pruning: data/resnet-20-iterative/finetuning-sp-0.2-ep36.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.36
+Name: ResNet-20-iterative-0.36-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.36-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+---
+load_model_before_pruning: data/resnet-20-iterative/finetuning-sp-0.36-ep36.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.488
+Name: ResNet-20-iterative-0.488-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.488-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+---
+load_model_before_pruning: data/resnet-20-iterative/finetuning-sp-0.488-ep36.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.59
+Name: ResNet-20-iterative-0.59-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.59-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+---
+load_model_before_pruning: data/resnet-20-iterative/finetuning-sp-0.59-ep36.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.672
+Name: ResNet-20-iterative-0.672-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.672-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+---
+load_model_before_pruning: data/resnet-20-iterative/finetuning-sp-0.672-ep36.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.738
+Name: ResNet-20-iterative-0.672-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.738-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+---
+load_model_before_pruning: data/resnet-20-iterative/finetuning-sp-0.738-ep36.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.79
+Name: ResNet-20-iterative-0.79-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.79-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+---
+load_model_before_pruning: data/resnet-20-iterative/finetuning-sp-0.79-ep36.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.832
+Name: ResNet-20-iterative-0.832-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.832-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+---
+load_model_before_pruning: data/resnet-20-iterative/finetuning-sp-0.832-ep36.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.866
+Name: ResNet-20-iterative-0.866-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.866-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+---
+load_model_before_pruning: data/resnet-20-iterative/finetuning-sp-0.866-ep36.h
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.893
+Name: ResNet-20-iterative-0.893-finetuning
+save_model:
+    36: data/resnet-20-iterative/finetuning-sp-0.893-ep36.h
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+
+

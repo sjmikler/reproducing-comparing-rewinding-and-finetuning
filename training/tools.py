@@ -1,15 +1,9 @@
 import os
 import pickle
-from collections import Counter, abc
-from copy import deepcopy
+from collections import Counter
 
 import numpy as np
 import tensorflow as tf
-
-try:
-    from ._initialize import *
-except ImportError:
-    pass
 
 
 def set_memory_growth():
@@ -18,11 +12,11 @@ def set_memory_growth():
         tf.config.experimental.set_memory_growth(gpu, True)
 
 
-def set_visible_gpu(gpus=[]):
-    if isinstance(gpus, abc.Iterable):
-        tf.config.set_visible_devices(gpus, 'GPU')
-    else:
-        tf.config.set_visible_devices([gpus], 'GPU')
+def set_visible_gpu(gpus=()):
+    all_gpus = tf.config.get_visible_devices("GPU")
+    selected_gpus = [all_gpus[idx] for idx in gpus]
+    tf.config.set_visible_devices(selected_gpus, 'GPU')
+    print(f"SETTING VISIBLE GPU: {selected_gpus}")
 
 
 def set_precision(precision):
@@ -59,8 +53,8 @@ def log_from_history(history, exp):
     exp.TRAIN_ACCU = max_tr_acc
     exp.TRAIN_LOSS = min_tr_loss
 
-    if hasattr(exp, 'tensorboard_log') and exp.tensorboard_log:
-        writer = tf.summary.create_file_writer(exp.tensorboard_log)
+    if exp.get('tensorboard'):
+        writer = tf.summary.create_file_writer(exp['tensorboard'])
         with writer.as_default():
             for key in history:
                 for idx, value in enumerate(history[key]):
@@ -199,8 +193,11 @@ def build_optimizer(model, optimizer):
 
 
 class CheckpointAfterEpoch(tf.keras.callbacks.Callback):
-    def __init__(self, epoch2path, epoch2path_optim):
+    def __init__(self, epoch2path, epoch2path_optim=None):
         super().__init__()
+        if epoch2path_optim is None:
+            epoch2path_optim = {}
+
         self.epoch2path = epoch2path
         self.epoch2path_optim = epoch2path_optim
         self.created_model_ckp = []

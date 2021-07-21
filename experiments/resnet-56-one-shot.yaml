@@ -1,0 +1,49 @@
+logs: data/resnet-56-one-shot/info.yaml
+
+epochs: 36
+initial_epoch: 0
+steps_per_epoch: 2000
+
+lr_boundaries: [36000, 54000]
+lr_values: [0.1, 0.01, 0.001]
+
+model_args:
+    n_classes: 10
+    l2_reg: 1e-4
+    features: [16, 32, 64]
+    resnet_version: 1
+    BLOCKS_IN_GROUP: 9
+    BATCH_NORM_DECAY: 0.997
+    BATCH_NORM_EPSILON: 1e-3
+model: resnet
+
+cifar_version: 10
+data_dir: tensorflow_datasets
+---
+pruning: null
+Name: ResNet-56-baseline
+save_model:
+    4: data/resnet-56-one-shot/baseline-ep4.h5
+    36: data/resnet-56-one-shot/baseline-ep36.h5
+---
+load_model_before_pruning: data/resnet-56-one-shot/baseline-ep36.h5
+pruning: magnitude
+pruning_config:
+    sparsity: 0.893
+Name: ResNet-56-one-shot-0.893-LR-rewinding
+---
+load_model_before_pruning: data/resnet-56-one-shot/baseline-ep36.h5
+load_model_after_pruning: data/resnet-56-one-shot/baseline-ep4.h5
+initial_epoch: 4
+pruning: magnitude
+pruning_config:
+    sparsity: 0.893
+Name: ResNet-56-one-shot-0.893-W-rewinding
+---
+load_model_before_pruning: data/resnet-56-one-shot/baseline-ep36.h5
+lr_boundaries: [1]
+lr_values: [0.001, 0.001]
+pruning: magnitude
+pruning_config:
+    sparsity: 0.893
+Name: ResNet-56-one-shot-0.893-finetuning

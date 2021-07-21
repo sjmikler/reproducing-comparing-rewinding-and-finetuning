@@ -34,3 +34,6 @@ for idx, _exp in enumerate(exp_queue):
     pprint(exp)
 
     training.run.run_experiment(exp)
+    with open(exp["logs"], "a") as f:
+        yaml.safe_dump(exp, stream=f, explicit_start=True, sort_keys=False)
+    print(f"SAVED DEFINITION LOGS: {exp['logs']}")

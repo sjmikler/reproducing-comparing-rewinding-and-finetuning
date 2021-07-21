@@ -29,7 +29,11 @@ def run_experiment(exp):
     pruning.tools.globally_enable_pruning()
     loss_fn = tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True)
     dataset = datasets.cifar(version=exp["cifar_version"])
-    model = models.ResNetStiff(**exp["model_args"])
+
+    if exp["model"] == "resnet":
+        model = models.ResNetStiff(**exp["model_args"])
+    else:
+        raise NotImplementedError
 
     lr_metric = training.tools.get_optimizer_lr_metric(optimizer)
     metrics = ["accuracy", lr_metric]
@@ -61,7 +65,7 @@ def run_experiment(exp):
         print(f"LOADED AFTER PRUNING {path}, but keeping {num_masks} masks")
 
     checkpoint_callback = training.tools.CheckpointAfterEpoch(
-        epoch2path=exp['save_model'])
+        epoch2path=exp.get('save_model'))
 
     # just apply pruning by zeroing weights with previously calculated masks
     pruning.tools.apply_pruning_masks(model, pruning_method=exp['pruning'])
@@ -78,7 +82,7 @@ def run_experiment(exp):
                             initial_epoch=exp['initial_epoch'],
                             callbacks=callbacks).history
 
-        exp["FINAL_DENSITY"] = pruning.tools.report_density(model)
+        exp["FINAL_DENSITY"] = float(pruning.tools.report_density(model))
         print("FINAL DENSITY:", exp["FINAL_DENSITY"])
         training.tools.log_from_history(history, exp=exp)
     checkpoint_callback.list_created_checkpoints()

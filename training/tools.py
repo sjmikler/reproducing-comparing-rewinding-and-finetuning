@@ -46,12 +46,12 @@ def log_from_history(history, exp):
 
     print(f"BEST ACCURACY: {max_acc}")
 
-    exp.TIME = datetime.datetime.now().strftime("%Y.%m.%d %H:%M")
-    exp.ACC = max_acc
-    exp.FINAL_ACCU = final_acc
-    exp.VALID_LOSS = min_loss
-    exp.TRAIN_ACCU = max_tr_acc
-    exp.TRAIN_LOSS = min_tr_loss
+    exp["TIME"] = datetime.datetime.now().strftime("%Y.%m.%d %H:%M")
+    exp["ACC"] = float(max_acc)
+    exp["FINAL_ACCU"] = float(final_acc)
+    exp["VALID_LOSS"] = float(min_loss)
+    exp["TRAIN_ACCU"] = float(max_tr_acc)
+    exp["TRAIN_LOSS"] = float(min_tr_loss)
 
     if exp.get('tensorboard'):
         writer = tf.summary.create_file_writer(exp['tensorboard'])
@@ -61,28 +61,6 @@ def log_from_history(history, exp):
                     tf.summary.scalar(key, value, idx + 1)
             tf.summary.text("experiment", data=str(exp), step=0)
     return exp
-
-
-def get_kernels(model):
-    return [l.kernel for l in model.layers if hasattr(l, 'kernel')]
-
-
-def set_all_weights_from_model(model, source_model):
-    """Warning if a pair doesn't match."""
-
-    for w1, w2 in zip(model.weights, source_model.weights):
-        if w1.shape == w2.shape:
-            w1.assign(w2)
-        else:
-            print(f"WARNING: Skipping {w1.name}: {w1.shape} != {w2.shape}")
-
-
-def clone_model(model):
-    """tf.keras.models.clone_model + toolkit.set_all_weights_from_model"""
-
-    new_model = tf.keras.models.clone_model(model)
-    set_all_weights_from_model(new_model, model)
-    return new_model
 
 
 def reset_weights_to_checkpoint(model, ckp=None, skip_keyword=None):
@@ -99,22 +77,6 @@ def reset_weights_to_checkpoint(model, ckp=None, skip_keyword=None):
         w1.assign(w2)
     print(f"INFO RESET: Skipped {skipped} layers with keyword {skip_keyword}!")
     return skipped
-
-
-def clip_many(values, clip_at, clip_from=None, inplace=False):
-    """Clips a list of tf or np arrays. Returns tf arrays."""
-
-    if clip_from is None:
-        clip_from = -clip_at
-
-    if inplace:
-        for v in values:
-            v.assign(tf.clip_by_value(v, clip_from, clip_at))
-    else:
-        r = []
-        for v in values:
-            r.append(tf.clip_by_value(v, clip_from, clip_at))
-        return r
 
 
 def concatenate_flattened(arrays):
@@ -177,24 +139,11 @@ def save_model(model, path):
     model.save_weights(path, save_format="h5")
 
 
-def update_optimizer(optimizer, path):
-    with open(path, 'rb') as f:
-        weights = pickle.load(f)
-    try:
-        optimizer.set_weights(weights)
-    except ValueError as e:
-        print("!!!WARNING!!! Tried to load empty optimizer!")
-        print(e)
-
-
-def build_optimizer(model, optimizer):
-    zero_grad = [tf.zeros_like(w) for w in model.trainable_weights]
-    optimizer.apply_gradients(zip(zero_grad, model.trainable_weights))
-
-
 class CheckpointAfterEpoch(tf.keras.callbacks.Callback):
-    def __init__(self, epoch2path, epoch2path_optim=None):
+    def __init__(self, epoch2path=None, epoch2path_optim=None):
         super().__init__()
+        if epoch2path is None:
+            epoch2path = {}
         if epoch2path_optim is None:
             epoch2path_optim = {}
 
@@ -220,9 +169,13 @@ class CheckpointAfterEpoch(tf.keras.callbacks.Callback):
         print(f"CREATED MODEL CHECKPOINTS:")
         for ckp in self.created_model_ckp:
             print(ckp)
+        if not self.created_model_ckp:
+            print("NONE")
         print(f"CREATED OPTIM CHECKPOINTS:")
         for ckp in self.created_optim_ckp:
             print(ckp)
+        if not self.created_optim_ckp:
+            print("NONE")
 
 
 def get_optimizer_lr_metric(opt):
@@ -233,10 +186,3 @@ def get_optimizer_lr_metric(opt):
         return lr
     else:
         return None
-
-
-def get_loss_fn_from_alias(alias):
-    if alias == 'crossentropy':
-        return tf.losses.SparseCategoricalCrossentropy(from_logits=True)
-    else:
-        raise NotImplementedError(f"Unknown alias {alias}")

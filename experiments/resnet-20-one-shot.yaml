@@ -10,12 +10,12 @@ lr_values: [0.1, 0.01, 0.001]
 
 model_args:
     dataset: cifar10
-    l2_reg: 1e-4
+    l2_reg: 0.0001
     features: [16, 32, 64]
     resnet_version: 1
     BLOCKS_IN_GROUP: 3
     BATCH_NORM_DECAY: 0.997
-    BATCH_NORM_EPSILON: 1e-3
+    BATCH_NORM_EPSILON: 0.001
 model: resnet
 
 cifar_version: 10

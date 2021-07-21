@@ -21,8 +21,6 @@ class MaskedDense(tf.keras.layers.Dense):
 
     def call(self, x):
         masked_w = tf.multiply(self.kernel, self.kernel_mask)
-        # masked_w = masked_w / tf.reduce_mean(self.kernel_mask)
-
         result = tf.matmul(x, masked_w)
 
         if self.use_bias:
@@ -32,8 +30,11 @@ class MaskedDense(tf.keras.layers.Dense):
 
     def set_pruning_mask(self, new_mask: np.ndarray):
         """
-        :param new_mask: mask of the same shape as `layer.kernel`
-        :return: None
+        Args:
+            new_mask: mask of the same shape as `layer.kernel`
+
+        Returns:
+            None
         """
         tf.assert_equal(new_mask.shape, self.kernel_mask.shape)
         self.kernel_mask.assign(new_mask)
@@ -62,8 +63,6 @@ class MaskedConv(tf.keras.layers.Conv2D):
 
     def call(self, x):
         masked_w = tf.multiply(self.kernel, self.kernel_mask)
-        # masked_w = masked_w / tf.reduce_mean(self.kernel_mask)
-
         result = tf.nn.conv2d(
             x, masked_w, strides=self.strides, padding=self.padding.upper()
         )
@@ -75,8 +74,11 @@ class MaskedConv(tf.keras.layers.Conv2D):
 
     def set_pruning_mask(self, new_mask: np.ndarray):
         """
-        :param new_mask: mask of the same shape as `layer.kernel`
-        :return: None
+        Args:
+            new_mask: mask of the same shape as `layer.kernel`
+
+        Returns:
+            None
         """
         tf.assert_equal(new_mask.shape, self.kernel_mask.shape)
         self.kernel_mask.assign(new_mask)

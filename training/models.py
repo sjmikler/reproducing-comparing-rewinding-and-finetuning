@@ -1,8 +1,6 @@
 from collections.abc import Iterable
-import tensorflow as tf
 
-_BATCH_NORM_DECAY = 0.997
-_BATCH_NORM_EPSILON = 1e-5
+import tensorflow as tf
 
 
 def classifier(
@@ -41,76 +39,6 @@ def classifier(
             kernel_initializer=initializer,
         )(flow)
     return outs
-
-
-def VGG(
-    input_shape,
-    n_classes,
-    version=None,
-    l1_reg=0,
-    l2_reg=1e-4,
-    group_sizes=(1, 1, 2, 2, 2),
-    features=(64, 128, 256, 512, 512),
-    pools=(2, 2, 2, 2, 2),
-    regularize_bias=True,
-    **kwds,
-):
-    print(f"VGG: unknown parameters: {list(kwds)}")
-    if version:
-        if version == 11:
-            group_sizes = (1, 1, 2, 2, 2)
-        elif version == 13:
-            group_sizes = (2, 2, 2, 2, 2)
-        elif version == 16:
-            group_sizes = (2, 2, 3, 3, 3)
-        elif version == 19:
-            group_sizes = (2, 2, 4, 4, 4)
-        else:
-            raise KeyError(f"Unkown version={version}!")
-
-    regularizer = (
-        tf.keras.regularizers.l1_l2(l1_reg, l2_reg) if l2_reg or l1_reg else None
-    )
-    bias_regularizer = regularizer if regularize_bias else None
-
-    def conv3x3(*args, **kwds):
-        # bias is not needed, since batch norm does it
-        return tf.keras.layers.Conv2D(
-            *args,
-            **kwds,
-            kernel_size=3,
-            padding="same",
-            use_bias=False,
-            kernel_regularizer=regularizer,
-        )
-
-    def bn_relu(x):
-        x = tf.keras.layers.BatchNormalization(
-            beta_regularizer=bias_regularizer, gamma_regularizer=bias_regularizer,
-            momentum=_BATCH_NORM_DECAY, epsilon=_BATCH_NORM_EPSILON,
-        )(x)
-        return tf.keras.layers.ReLU()(x)
-
-    inputs = tf.keras.layers.Input(shape=input_shape)
-    flow = inputs
-
-    skip_first_maxpool = True
-    for group_size, width, pool in zip(group_sizes, features, pools):
-
-        if not skip_first_maxpool:
-            flow = tf.keras.layers.MaxPool2D(pool)(flow)
-        else:
-            skip_first_maxpool = False
-
-        for _ in range(group_size):
-            flow = conv3x3(filters=width)(flow)
-            flow = bn_relu(flow)
-
-    outs = classifier(
-        flow, n_classes, regularizer=regularizer, bias_regularizer=bias_regularizer
-    )
-    model = tf.keras.Model(inputs=inputs, outputs=outs)
-    return model
 
 
 def ResNetStiff(
@@ -285,78 +213,4 @@ def ResNetStiff(
         pooling=final_pooling,
     )
     model = tf.keras.Model(inputs=inputs, outputs=outputs)
-    return model
-
-
-def LeNet(
-    input_shape,
-    n_classes,
-    l1_reg=0,
-    l2_reg=0,
-    layer_sizes=(300, 100),
-    initializer="glorot_uniform",
-    **kwds,
-):
-    print(f"LeNet: unknown parameters: {list(kwds)}")
-    regularizer = (
-        tf.keras.regularizers.l1_l2(l1_reg, l2_reg) if l2_reg or l1_reg else None
-    )
-    initializer = initializer
-
-    def dense(*args, **kwds):
-        return tf.keras.layers.Dense(
-            *args,
-            **kwds,
-            kernel_initializer=initializer,
-            kernel_regularizer=regularizer,
-        )
-
-    inputs = tf.keras.layers.Input(shape=input_shape)
-
-    flow = tf.keras.layers.Flatten()(inputs)
-    for layer_size in layer_sizes:
-        flow = dense(layer_size, activation="relu")(flow)
-
-    outs = dense(n_classes, activation=None)(flow)
-    model = tf.keras.Model(inputs=inputs, outputs=outs)
-    return model
-
-
-def LeNetConv(
-    input_shape, n_classes, l1_reg=0, l2_reg=0, initializer="glorot_uniform", **kwds
-):
-    print(f"Unknown parameters: {list(kwds)}")
-    regularizer = (
-        tf.keras.regularizers.l1_l2(l1_reg, l2_reg) if l2_reg or l1_reg else None
-    )
-    initializer = initializer
-
-    def dense(*args, **kwds):
-        return tf.keras.layers.Dense(
-            *args,
-            **kwds,
-            kernel_initializer=initializer,
-            kernel_regularizer=regularizer,
-        )
-
-    def conv(*args, **kwds):
-        return tf.keras.layers.Conv2D(
-            *args,
-            **kwds,
-            kernel_initializer=initializer,
-            kernel_regularizer=regularizer,
-        )
-
-    inputs = tf.keras.layers.Input(shape=input_shape)
-
-    flow = conv(20, 5, activation="relu")(inputs)
-    flow = tf.keras.layers.MaxPool2D(2)(flow)
-    flow = conv(50, 5, activation="relu")(flow)
-    flow = tf.keras.layers.MaxPool2D(2)(flow)
-
-    flow = tf.keras.layers.Flatten()(flow)
-    flow = dense(500, activation="relu")(flow)
-
-    outs = dense(n_classes, activation=None)(flow)
-    model = tf.keras.Model(inputs=inputs, outputs=outs)
     return model

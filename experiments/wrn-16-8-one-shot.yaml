@@ -8,13 +8,13 @@ lr_boundaries: [36000, 54000]
 lr_values: [0.1, 0.01, 0.001]
 
 model_args:
-    n_classes: 10
-    l2_reg: 2e-4
+    dataset: cifar10
+    l2_reg: 0.0002
     features: [128, 256, 512]
     resnet_version: 2
     BLOCKS_IN_GROUP: 2
     BATCH_NORM_DECAY: 0.9
-    BATCH_NORM_EPSILON: 1e-5
+    BATCH_NORM_EPSILON: 0.00001
 model: resnet
 
 cifar_version: 10

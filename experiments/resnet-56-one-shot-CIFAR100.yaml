@@ -1,4 +1,5 @@
 logs: data/resnet-56-one-shot-cifar100/info.yaml
+tensorboard: data/resnet-56-one-shot-cifar100/tb
 
 epochs: 36
 initial_epoch: 0

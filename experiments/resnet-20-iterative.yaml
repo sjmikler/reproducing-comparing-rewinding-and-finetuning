@@ -1,4 +1,5 @@
 logs: data/resnet-20-iterative/info.yaml
+tensorboard: data/resnet-20-iterative/tb
 
 epochs: 36
 initial_epoch: 0

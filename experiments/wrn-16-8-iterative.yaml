@@ -1,6 +1,7 @@
 logs: data/wrn-16-8-iterative/info.yaml
+tensorboard: data/wrn-16-8-iterative/tb
 
-epochs: 36
+epochs: 40
 initial_epoch: 0
 steps_per_epoch: 2000
 

@@ -1,4 +1,5 @@
 logs: data/resnet-110-one-shot/info.yaml
+tensorboard: data/resnet-110-one-shot/tb
 
 epochs: 36
 initial_epoch: 0

@@ -65,5 +65,11 @@ More detailed logs in form of TensorBoard logs will be available under:
 ```
 tensorboard: data/resnet-20-one-shot/tb
 ```
+
 To open those, please refer to [TensorBoard](https://www.tensorflow.org/tensorboard).
 
+
+### Checkpoints of already trained models
+
+We can upload some checkpoints via Zenodo platform.
+Please contanct us directly.

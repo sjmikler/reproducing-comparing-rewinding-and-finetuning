@@ -41,9 +41,9 @@ def run_experiment(exp):
     training.tools.print_model_info(model)
 
     # load checkpointed all weights before the pruning
-    if hasattr(exp, 'load_model_before_pruning') and exp.load_model_before_pruning:
-        model.load_weights(exp.load_model_before_pruning)
-        print(f"LOADED BEFORE PRUNING {exp.load_model_before_pruning}")
+    if exp.get('load_model_before_pruning'):
+        model.load_weights(exp['load_model_before_pruning'])
+        print(f"LOADED BEFORE PRUNING {exp['load_model_before_pruning']}")
 
     model = pruning.tools.set_pruning_masks(model=model,
                                             pruning_method=exp["pruning"],
@@ -52,7 +52,7 @@ def run_experiment(exp):
     assert isinstance(model, tf.keras.Model)
 
     # load or reset weights after the pruning, do not change masks
-    if 'load_model_after_pruning' in exp and exp['load_model_after_pruning']:
+    if exp.get('load_model_after_pruning'):
         path = exp['load_model_after_pruning']
         if path == 'random':
             ckp = None

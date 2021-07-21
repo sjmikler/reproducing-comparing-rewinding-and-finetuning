@@ -15,7 +15,7 @@ model_args:
     resnet_version: 1
     BLOCKS_IN_GROUP: 9
     BATCH_NORM_DECAY: 0.997
-    BATCH_NORM_EPSILON: 0.001
+    BATCH_NORM_EPSILON: 0.00001
 model: resnet
 
 cifar_version: 100

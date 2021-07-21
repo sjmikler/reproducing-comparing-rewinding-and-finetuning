@@ -1,5 +1,10 @@
 # Comparing Rewinding and Fine-tuning in Neural Network Pruning -- Reproducibility Challenge 2021
 
+### Links
+* [Original paper](https://arxiv.org/abs/2003.02389)
+* [Reproduction on OpenReview](https://openreview.net/forum?id=chVdm1z8sOQ)
+* [Reproduction PDF](https://openreview.net/pdf?id=chVdm1z8sOQ)
+
 ### Requirements
 
 We conducted most of our experiments using following versions of packages:
@@ -31,7 +36,7 @@ python run.py --exp=experiments/resnet-20-iterative.yaml
 
 If you have multiple GPU available, you can use `--gpu` flag to choose which should be used.
 Otherwise, only the first GPU will be used (`/device:GPU:0`).
-To use second GPU, you can run:
+To use the second GPU, you can run:
 
 ```
 python run.py --exp=experiments/resnet-20-one-shot.yaml --gpu=1

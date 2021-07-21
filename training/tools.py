@@ -1,5 +1,6 @@
 import os
 import pickle
+import random
 from collections import Counter
 
 import numpy as np
@@ -54,7 +55,9 @@ def log_from_history(history, exp):
     exp["TRAIN_LOSS"] = float(min_tr_loss)
 
     if exp.get('tensorboard'):
-        writer = tf.summary.create_file_writer(exp['tensorboard'])
+        rnd_idx = random.randint(10000, 99999)
+        path = os.path.join(exp['tensorboard'], str(rnd_idx))
+        writer = tf.summary.create_file_writer(path)
         with writer.as_default():
             for key in history:
                 for idx, value in enumerate(history[key]):

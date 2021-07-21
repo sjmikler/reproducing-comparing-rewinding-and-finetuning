@@ -344,5 +344,3 @@ save_model:
     36: data/resnet-20-iterative/finetuning-sp-0.893-ep36.h
 lr_boundaries: [1]
 lr_values: [0.001, 0.001]
-
-

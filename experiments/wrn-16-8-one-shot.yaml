@@ -5,8 +5,8 @@ epochs: 40
 initial_epoch: 0
 steps_per_epoch: 2000
 
-lr_boundaries: [36000, 54000]
-lr_values: [0.1, 0.01, 0.001]
+lr_boundaries: [32000, 48000, 64000]
+lr_values: [0.1, 0.02, 0.004, 0.0008]
 
 model_args:
     dataset: cifar10

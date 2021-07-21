@@ -1,4 +1,4 @@
-# Comparing Rewinding and Fine-tuning in Neural Network Pruning -- Reproducibility Challenge 2021
+# Comparing Rewinding and Fine-tuning in Neural Network Pruning: Reproducibility Challenge 2021
 
 ### Links
 * [Original paper](https://arxiv.org/abs/2003.02389)
@@ -7,7 +7,7 @@
 
 ### Requirements
 
-We conducted most of our experiments using following versions of packages:
+We conducted most of our experiments using the following versions of packages:
 
 ```
 yaml~=0.2.5
@@ -19,30 +19,31 @@ tqdm~=4.61.2
 ```
 
 However, different versions of TensorFlow (`2.3`, `2.5`) have been shown to work as well.
-We expect readers who want to replicate our experimetns to be using a machine with at least one GPU.
+We expect readers who want to replicate our experiments to be using a machine with at least one GPU.
 Recreating them using CPU will be very time-consuming and might require some changes in code.
 
 ### Training models
 
-Ready-to-use experiment definitions are available in `experiments` directory.
-Those can be easily modified to get different experiments.
+Ready-to-use experiment definitions are available in the `experiments` directory.
+That can be easily modified to get different experiments.
 We tried to select parameter names to be self-explanatory.
-You can run each experiment using `run.py` scripy with `--exp` flag.
+You can run each experiment using the `run.py` script with `--exp` flag.
 For example:
 
 ```
 python run.py --exp=experiments/resnet-20-iterative.yaml
 ```
 
-If you have multiple GPU available, you can use `--gpu` flag to choose which should be used.
-Otherwise, only the first GPU will be used (`/device:GPU:0`).
+If you have multiple GPUs available, you can use `--gpu` flag to choose which one should be used.
+Otherwise, the default is the first listed GPU (usually `/device:GPU:0`).
+GPU indexing starts at 0.
 To use the second GPU, you can run:
 
 ```
 python run.py --exp=experiments/resnet-20-one-shot.yaml --gpu=1
 ```
 
-Model checkpoints will be saved under path specified in `.yaml` file, for example:
+Model checkpoints will be saved under the path specified in `.yaml` file, for example:
 
 ```
 steps_per_epoch: 2000
@@ -51,17 +52,17 @@ save_model:
     36: data/resnet-20-iterative/baseline-ep36.h5
 ```
 
-In this example, there will be two checkpoints: one after 8000 (2000 * 4) and second after 72000 (2000 * 36) iterations.
+In this example, there will be two checkpoints: one after 8000 (2000 * 4) and the second after 72000 (2000 * 36) iterations.
 Those can be used as starting points for other experiments.
 
 ### Reading results
 
-Simple logs will be available under path specified in `.yaml` file:
+Simple logs will be available under the path specified in `.yaml` file:
 ```
 logs: data/resnet-20-iterative/info.yaml
 ```
 
-More detailed logs in form of TensorBoard logs will be available under:
+More detailed logs in the form of TensorBoard logs will be available under:
 ```
 tensorboard: data/resnet-20-one-shot/tb
 ```
@@ -72,4 +73,4 @@ To open those, please refer to [TensorBoard](https://www.tensorflow.org/tensorbo
 ### Checkpoints of already trained models
 
 We can upload some checkpoints via Zenodo platform.
-Please contanct us directly.
+Please contact us directly.

@@ -2,8 +2,7 @@
 
 ### Links
 * [Original paper](https://arxiv.org/abs/2003.02389)
-* [Reproduction on OpenReview](https://openreview.net/forum?id=chVdm1z8sOQ)
-* [Reproduction PDF](https://openreview.net/pdf?id=chVdm1z8sOQ)
+* [Reproduction PDF](ANON_REPORT.pdf)
 
 ### Requirements
 
